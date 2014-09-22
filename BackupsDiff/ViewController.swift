@@ -33,7 +33,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         {
             devices = NSMutableDictionary()
         }
-        devicesArray = NSMutableArray(array: ["a", "b", "c"])
     }
 
     @IBOutlet weak var column: NSTableColumn!
@@ -57,7 +56,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     var devices : NSMutableDictionary!
     
-    var devicesArray : NSMutableArray!
+    var backups : NSMutableArray!
     
     @IBAction func getDevices(sender: AnyObject) {
         var nm = NSFileManager()
@@ -130,6 +129,15 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         var cellView = tableView.makeViewWithIdentifier("device", owner: tableView) as NSTableCellView
         cellView.textField.stringValue = devices.allValues[row] as NSString
         return cellView
+    }
+    
+    func tableViewSelectionDidChange(notification: NSNotification!) {
+        var tableView = notification.object as NSTableView
+        if (tableView.tag == 1)
+        {
+            //NSLog("changed")
+            
+        }
     }
     
     @IBOutlet weak var devicesView: NSScrollView!
