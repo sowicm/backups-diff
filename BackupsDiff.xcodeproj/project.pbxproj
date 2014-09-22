@@ -12,6 +12,7 @@
 		B7417EDD19CFFFFE004F77A8 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B7417EDC19CFFFFE004F77A8 /* Images.xcassets */; };
 		B7417EE019CFFFFE004F77A8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B7417EDE19CFFFFE004F77A8 /* Main.storyboard */; };
 		B7417EEC19CFFFFE004F77A8 /* BackupsDiffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7417EEB19CFFFFE004F77A8 /* BackupsDiffTests.swift */; };
+		B7E7DF9F19D02D00005ECABD /* DevicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E7DF9E19D02D00005ECABD /* DevicesView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +35,7 @@
 		B7417EE519CFFFFE004F77A8 /* BackupsDiffTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BackupsDiffTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7417EEA19CFFFFE004F77A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B7417EEB19CFFFFE004F77A8 /* BackupsDiffTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupsDiffTests.swift; sourceTree = "<group>"; };
+		B7E7DF9E19D02D00005ECABD /* DevicesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DevicesView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +79,7 @@
 			children = (
 				B7417ED819CFFFFE004F77A8 /* AppDelegate.swift */,
 				B7417EDA19CFFFFE004F77A8 /* ViewController.swift */,
+				B7E7DF9E19D02D00005ECABD /* DevicesView.swift */,
 				B7417EDC19CFFFFE004F77A8 /* Images.xcassets */,
 				B7417EDE19CFFFFE004F77A8 /* Main.storyboard */,
 				B7417ED619CFFFFE004F77A8 /* Supporting Files */,
@@ -208,6 +211,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B7E7DF9F19D02D00005ECABD /* DevicesView.swift in Sources */,
 				B7417EDB19CFFFFE004F77A8 /* ViewController.swift in Sources */,
 				B7417ED919CFFFFE004F77A8 /* AppDelegate.swift in Sources */,
 			);
@@ -397,6 +401,7 @@
 				B7417EF119CFFFFE004F77A8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B7417EF219CFFFFE004F77A8 /* Build configuration list for PBXNativeTarget "BackupsDiffTests" */ = {
 			isa = XCConfigurationList;
@@ -405,6 +410,7 @@
 				B7417EF419CFFFFE004F77A8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
