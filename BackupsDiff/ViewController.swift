@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ViewController: NSViewController {
+class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +36,7 @@ class ViewController: NSViewController {
         devicesArray = NSMutableArray(array: ["a", "b", "c"])
     }
 
+    @IBOutlet weak var column: NSTableColumn!
     @IBOutlet var devicesController: NSArrayController!
 
     func saveDevices() {
@@ -114,7 +115,23 @@ class ViewController: NSViewController {
         
         saveDevices()
     }
+    
 
+    func numberOfRowsInTableView(tableView: NSTableView!) -> Int {
+        if (tableView.tag == 1)
+        {
+            return devices.count
+        }
+        return 0
+    }
+    
+    
+    func tableView(tableView: NSTableView!, viewForTableColumn tableColumn: NSTableColumn!, row: Int) -> NSView! {
+        var cellView = tableView.makeViewWithIdentifier("device", owner: tableView) as NSTableCellView
+        cellView.textField.stringValue = devices.allValues[row] as NSString
+        return cellView
+    }
+    
     @IBOutlet weak var devicesView: NSScrollView!
 }
 

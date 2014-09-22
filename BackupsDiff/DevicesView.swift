@@ -16,4 +16,15 @@ class DevicesView: NSTableView {
         // Drawing code here.
     }
     
+    override func viewAtColumn(column: Int, row: Int, makeIfNecessary: Bool) -> AnyObject! {
+        var cellView = NSTableCellView()
+        cellView.textField.stringValue = "abc"
+        return cellView
+    }
+    
+    //    override func viewfor
+    
+    override func rowForView(view: NSView!) -> Int {
+        return 3
+    }
 }
