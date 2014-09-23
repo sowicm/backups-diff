@@ -852,12 +852,40 @@
                                     <action selector="getBackupInfo:" target="XfG-lQ-9wD" id="Rql-LO-lVW"/>
                                 </connections>
                             </button>
+                            <matrix verticalHuggingPriority="750" fixedFrame="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="H2h-DK-lUu">
+                                <rect key="frame" x="293" y="258" width="156" height="18"/>
+                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                <size key="cellSize" width="76" height="18"/>
+                                <size key="intercellSpacing" width="4" height="2"/>
+                                <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="Yu1-Kv-ia6">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <cells>
+                                    <column>
+                                        <buttonCell type="radio" title="Manifest" imagePosition="left" alignment="left" state="on" tag="1" inset="2" id="Tft-cW-LW1">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </column>
+                                    <column>
+                                        <buttonCell type="radio" title="Info" imagePosition="left" alignment="left" inset="2" id="WBS-nO-5bM">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </column>
+                                </cells>
+                                <connections>
+                                    <action selector="sourceChanged:" target="XfG-lQ-9wD" id="FSF-m2-Pgl"/>
+                                </connections>
+                            </matrix>
                         </subviews>
                     </view>
                     <connections>
                         <outlet property="backupsView" destination="1da-wX-Btj" id="k5u-jQ-QZB"/>
                         <outlet property="devicesView" destination="VHg-n3-1fg" id="YC7-Km-EHy"/>
                         <outlet property="resultText" destination="txe-uS-eMp" id="Tk2-gI-9hT"/>
+                        <outlet property="sourceRadio" destination="H2h-DK-lUu" id="QMw-Ww-wyw"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

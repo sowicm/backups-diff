@@ -148,6 +148,151 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         }
     }
     
+    func compareBackupsBetween(apps1: NSArray, apps2: NSArray) {
+        
+        var result = NSMutableString()
+        
+        switch (sourceRadio.selectedColumn)
+        {
+        case 0:
+            result.appendString("Manifest\n\n\n")
+            break
+            
+        case 1:
+            result.appendString("Info\n\n\n")
+            break
+            
+        default:
+            break
+        }
+
+        
+        //NSLog("okay.");
+        
+        result.appendFormat("Previous has %ld applications\n", apps1.count)
+        //NSLog("Previous has %ld applications", apps1.count);
+        result.appendFormat("Then has %ld applications\n", apps2.count)
+        //NSLog("Then has %ld applications", apps2.count);
+        
+        result.appendString("\n= 删除的Apps:\n\n")
+        
+        var n1 = 0, n2 = 0
+        for (var i = 0; i < apps1.count; ++i)
+        {
+            var found = false
+            for (var j = 0; j < apps2.count; ++j)
+            {
+                if apps1.objectAtIndex(i).isEqualToString(apps2.objectAtIndex(j) as NSString)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                ++n1;
+                result.appendFormat("[%@]\n", apps1.objectAtIndex(i) as NSString)
+                //NSLog("the app [%@] is at iOS 7 but not at iOS 8", apps1.objectAtIndex(i) as NSString);
+            }
+        }
+        
+        result.appendFormat("\n共删除数量: %d\n", n1)
+        result.appendString("-------------------------------\n")
+        //NSLog("total %d items", n1);
+        //NSLog("---------------");
+        
+        result.appendString("\n= 新装的Apps:\n\n")
+        
+        for (var i = 0; i < apps2.count; ++i)
+        {
+            var found = false;
+            for (var j = 0; j < apps1.count; ++j)
+            {
+                if apps2.objectAtIndex(i).isEqualToString(apps1.objectAtIndex(j) as NSString)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                n2++;
+                result.appendFormat("[%@]\n", apps2.objectAtIndex(i) as NSString)
+                //NSLog("the app [%@] is at iOS 8 but not at iOS 7", apps2.objectAtIndex(i) as NSString);
+            }
+        }
+        result.appendFormat("\n共新装数量: %d\n", n2)
+        //NSLog("total %d items", n2);
+        
+        resultText.string = result
+    }
+    
+    func reloadCompare() {
+        let tableView = backupsView
+        
+        if tableView.selectedRow < 1 {
+            return
+        }
+        
+        let deviceFolder = dataFolder.stringByAppendingPathComponent(devices.allKeys[devicesView.selectedRow] as NSString)
+        
+        
+        /*
+        var nm = NSFileManager()
+        
+        if nm.fileExistsAtPath(path1)
+        {
+        
+        }
+        else
+        {
+        result.appendString("not found path1\n")
+        //NSLog("not found path1");
+        return
+        }
+        
+        if nm.fileExistsAtPath(path2)
+        {
+        
+        }
+        else
+        {
+        result.appendString("not found path2\n")
+        //NSLog("not found paht2");
+        return
+        }
+        */
+        
+        
+        switch sourceRadio.selectedColumn
+        {
+        case 0:
+            var manifest1 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow - 1] as NSString).stringByAppendingPathComponent("Manifest.plist"))
+            
+            var manifest2 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow] as NSString).stringByAppendingPathComponent("Manifest.plist"))
+            
+            var apps1 : NSDictionary! = manifest1?.objectForKey("Applications") as NSMutableDictionary
+            var apps2 : NSDictionary! = manifest2?.objectForKey("Applications") as NSMutableDictionary
+            
+            compareBackupsBetween(apps1.allKeys, apps2: apps2.allKeys)
+            
+            break;
+            
+        case 1:
+            var info1 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow - 1] as NSString).stringByAppendingPathComponent("Info.plist"))
+            
+            var info2 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow] as NSString).stringByAppendingPathComponent("Info.plist"))
+            
+            compareBackupsBetween(info1?.objectForKey("Installed Applications") as NSArray, apps2: info2?.objectForKey("Installed Applications") as NSArray)
+            
+            break;
+            
+        default:
+            break
+        }
+
+    }
+    
     func tableViewSelectionDidChange(notification: NSNotification!) {
         var tableView = notification.object as NSTableView
         if (tableView.tag == 1)
@@ -191,123 +336,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         }
         else if tableView.tag == 2
         {
-            var result = NSMutableString()
-            
-            if tableView.selectedRow < 1 {
-                return
-            }
-            
-            //var apps1, apps2 : NSMutableArray!
-            var apps_1, apps_2 : NSMutableDictionary!
-            var dict1, dict2 : NSMutableDictionary!
-            
-            let deviceFolder = dataFolder.stringByAppendingPathComponent(devices.allKeys[devicesView.selectedRow] as NSString)
-            let path1 = deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow - 1] as NSString).stringByAppendingPathComponent("Info.plist")
-            let path2 = deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow] as NSString).stringByAppendingPathComponent("Info.plist")
-
-            var manifest1 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow - 1] as NSString).stringByAppendingPathComponent("Manifest.plist"))
-            
-            var manifest2 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow] as NSString).stringByAppendingPathComponent("Manifest.plist"))
-            
-            var nm = NSFileManager()
-            
-            if nm.fileExistsAtPath(path1)
-            {
-                dict1 = NSMutableDictionary(contentsOfFile: path1)
-                //apps1 = dict1.objectForKey("Installed Applications") as NSMutableArray
-                apps_1 = manifest1?.objectForKey("Applications") as NSMutableDictionary
-            }
-            else
-            {
-                result.appendString("not found path1\n")
-                //NSLog("not found path1");
-                return
-            }
-            
-            if nm.fileExistsAtPath(path2)
-            {
-                dict2 = NSMutableDictionary(contentsOfFile: path2)
-                //apps2 = dict2.objectForKey("Installed Applications") as NSMutableArray
-                apps_2 = manifest2?.objectForKey("Applications") as NSMutableDictionary
-            }
-            else
-            {
-                result.appendString("not found path2\n")
-                //NSLog("not found paht2");
-                return
-            }
-            
-            //NSLog("okay.");
-            
-            result.appendFormat("Previous has %ld applications\n", apps_1.count)
-            //NSLog("Previous has %ld applications", apps1.count);
-            result.appendFormat("Then has %ld applications\n", apps_2.count)
-            //NSLog("Then has %ld applications", apps2.count);
-            
-            result.appendString("\n= 删除的Apps:\n\n")
-            
-            var n1 = 0, n2 = 0
-            for (var i = 0; i < apps_1.count; ++i)
-            {
-                var found = false
-                for (var j = 0; j < apps_2.count; ++j)
-                {
-                    //if apps1.objectAtIndex(i).isEqualToString(apps2.objectAtIndex(j) as NSString)
-                    if apps_1.allKeys[i].isEqualToString(apps_2.allKeys[j] as NSString)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    ++n1;
-                    //result.appendFormat("[%@]\n", apps1.objectAtIndex(i) as NSString)
-                    result.appendFormat("[%@]\n", apps_1.allKeys[i] as NSString)
-                    //NSLog("the app [%@] is at iOS 7 but not at iOS 8", apps1.objectAtIndex(i) as NSString);
-                }
-            }
-            
-            result.appendFormat("\n共删除数量: %d\n", n1)
-            result.appendString("-------------------------------\n")
-            //NSLog("total %d items", n1);
-            //NSLog("---------------");
-            
-            result.appendString("\n= 新装的Apps:\n\n")
-            
-            for (var i = 0; i < apps_2.count; ++i)
-            {
-                var found = false;
-                for (var j = 0; j < apps_1.count; ++j)
-                {
-                    //if apps2.objectAtIndex(i).isEqualToString(apps1.objectAtIndex(j) as NSString)
-                    if apps_2.allKeys[i].isEqualToString(apps_1.allKeys[j] as NSString)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    n2++;
-                    //result.appendFormat("[%@]\n", apps2.objectAtIndex(i) as NSString)
-                    result.appendFormat("[%@]\n", apps_2.allKeys[i] as NSString)
-                    //NSLog("the app [%@] is at iOS 8 but not at iOS 7", apps2.objectAtIndex(i) as NSString);
-                }
-            }
-            result.appendFormat("\n共新装数量: %d\n", n2)
-            //NSLog("total %d items", n2);
-            
-            resultText.string = result
+            reloadCompare()
         }
-    }
-    
-    func getNormalBackup(device : NSString) {
-        
-    }
-    
-    func getMoreBackups(device : NSString) {
-        
     }
     
     @IBAction func getBackupInfo(sender: AnyObject) {
@@ -372,9 +402,13 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         
     }
     
+    @IBAction func sourceChanged(sender: AnyObject) {
+        reloadCompare()
+    }
     
     @IBOutlet weak var devicesView: NSTableView!
     @IBOutlet weak var backupsView: NSTableView!
     @IBOutlet var resultText: NSTextView!
+    @IBOutlet weak var sourceRadio: NSMatrix!
 }
 
