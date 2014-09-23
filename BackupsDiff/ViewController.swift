@@ -18,6 +18,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         
         backupFormatter = NSDateFormatter()
         backupFormatter.dateFormat = "yyyyMMdd-HHmmss"
+        
+        backups = NSMutableArray()
 
         readDevices()
     }
@@ -112,18 +114,35 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
 
     func numberOfRowsInTableView(tableView: NSTableView!) -> Int {
-        if (tableView.tag == 1)
+        switch (tableView.tag)
         {
+        case 1:
             return devices.count
+            
+        case 2:
+            return backups.count
+            
+        default:
+            return 0
         }
-        return 0
     }
     
     
     func tableView(tableView: NSTableView!, viewForTableColumn tableColumn: NSTableColumn!, row: Int) -> NSView! {
-        var cellView = tableView.makeViewWithIdentifier("device", owner: tableView) as NSTableCellView
-        cellView.textField.stringValue = devices.allValues[row] as NSString
-        return cellView
+        switch (tableView.tag)
+        {
+        case 1:
+            var cellView = tableView.makeViewWithIdentifier("device", owner: tableView) as NSTableCellView
+            cellView.textField.stringValue = devices.allValues[row] as NSString
+            return cellView
+        case 2:
+            var cellView = tableView.makeViewWithIdentifier("backup", owner: tableView) as NSTableCellView
+            cellView.textField.stringValue = backups[row] as NSString
+            return cellView
+            
+        default:
+            return NSTableCellView()
+        }
     }
     
     func tableViewSelectionDidChange(notification: NSNotification!) {
@@ -138,59 +157,34 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             let file = dataFolder.stringByAppendingPathComponent(devices.allKeys[tableView.selectedRow] as NSString)
             if !nm.fileExistsAtPath(file)
             {
+                backupsView.reloadData()
                 return
             }
 
             let files = nm.contentsOfDirectoryAtPath(
                 file, error: nil)
             if files == nil {
+                backupsView.reloadData()
                 return
             }
             
             for each in files!
             {
-                /*
-                var file : NSString = each as NSString
+                let file = each as NSString
                 if file.hasPrefix(".")
                 {
                     continue
                 }
-                if file.rangeOfString("-").length > 0
-                {
-                    continue
-                }
-                if devices[file] != nil
+                if file.rangeOfString("-").length < 1
                 {
                     continue
                 }
                 
-                var input = NSTextField()
-                input.frame = NSMakeRect(0, 0, 200, 24)
-                //input.setFrameOrigin(0, 0)
-                //input.setFrameSize(200, 24)
-                //input.setValue(defaultValue)
-                
-                var alert = NSAlert()
-                alert.messageText = prompt
-                alert.informativeText = file
-                alert.addButtonWithTitle("Save")
-                alert.addButtonWithTitle("Cancel")
-                alert.accessoryView = input
-                if alert.runModal() == NSAlertFirstButtonReturn
-                {
-                    input.validateEditing()
-                    devices[file] = input.stringValue
-                    //NSLog("%@", input.stringValue)
-                }
-                else
-                {
-                    devices[file] = file
-                }*/
-                
-                //NSLog("%@", file as NSString)
+                backups.addObject(file)
             }
-
+            backupsView.reloadData()
         }
+//        backups.sortUsingComparator(<#cmptr: NSComparator##(AnyObject!, AnyObject!) -> NSComparisonResult#>)
     }
     
     @IBAction func getBackupInfo(sender: AnyObject) {
