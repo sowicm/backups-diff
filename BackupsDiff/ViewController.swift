@@ -228,6 +228,9 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
     
     func reloadCompare() {
+        
+        resultText.string = ""
+        
         let tableView = backupsView
         
         if tableView.selectedRow < 1 {
@@ -283,7 +286,15 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             
             var info2 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow] as NSString).stringByAppendingPathComponent("Info.plist"))
             
-            compareBackupsBetween(info1?.objectForKey("Installed Applications") as NSArray, apps2: info2?.objectForKey("Installed Applications") as NSArray)
+            var apps1: AnyObject? = info1?.objectForKey("Installed Applications")
+            var apps2: AnyObject? = info2?.objectForKey("Installed Applications")
+            
+            if apps1 == nil || apps2 == nil
+            {
+                return
+            }
+            
+            compareBackupsBetween(apps1 as NSArray, apps2: apps2 as NSArray)
             
             break;
             
