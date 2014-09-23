@@ -16,6 +16,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         var paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
         dataFolder = paths[0].stringByAppendingPathComponent("BackupsDiff/")
         
+        backupFolder = "/Users/sowicm/Library/Application Support/MobileSync/Backup"
+        
         backupFormatter = NSDateFormatter()
         backupFormatter.dateFormat = "yyyyMMdd-HHmmss"
         
@@ -46,6 +48,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
     
     var dataFolder : NSString!
+    var backupFolder : NSString!
     
     var devices : NSMutableDictionary!
     
@@ -56,7 +59,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     @IBAction func getDevices(sender: AnyObject) {
         var nm = NSFileManager()
         var error = NSError()
-        let files = nm.contentsOfDirectoryAtPath("/Users/sowicm/Library/Application Support/MobileSync/Backup", error: nil)
+        let files = nm.contentsOfDirectoryAtPath(backupFolder, error: nil)
         if files == nil {
           return
         }
@@ -187,6 +190,14 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
 //        backups.sortUsingComparator(<#cmptr: NSComparator##(AnyObject!, AnyObject!) -> NSComparisonResult#>)
     }
     
+    func getNormalBackup(device : NSString) {
+        
+    }
+    
+    func getMoreBackups(device : NSString) {
+        
+    }
+    
     @IBAction func getBackupInfo(sender: AnyObject) {
         var nm = NSFileManager()
         if devicesView.selectedRow < 0
@@ -195,40 +206,55 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             return
         }
         let device = devices.allKeys[devicesView.selectedRow] as NSString
-        let path = NSString(string: "/Users/sowicm/Library/Application Support/MobileSync/Backup/") + device
-        if !nm.fileExistsAtPath(path)
-        {
-            NSLog("未找到该设备备份")
+        
+        let files = nm.contentsOfDirectoryAtPath(backupFolder, error: nil)
+        if files == nil {
             return
         }
         
-        var file = path + "/Info.plist"
-        if !nm.fileExistsAtPath(file)
+        var count = 0
+        for each in files!
         {
-            NSLog("备份缺失文件")
-            return
+            let file = each as NSString
+            if !file.hasPrefix(device)
+            {
+                continue
+            }
+            
+            var path = backupFolder.stringByAppendingPathComponent(file)
+            
+            if !nm.fileExistsAtPath(path + "/Info.plist")
+            {
+                NSLog("%@ 中缺失文件 Info.plist", path)
+                continue
+            }
+            
+            let attr = nm.attributesOfItemAtPath(path + "/Info.plist", error: nil)!
+            let backupDate = backupFormatter.stringFromDate(attr["NSFileModificationDate"] as NSDate)
+            
+            var alreadyhas = false
+            for backup in backups {
+                if (backup as NSString).isEqualToString(backupDate) {
+                    alreadyhas = true
+                    break
+                }
+            }
+            if alreadyhas {
+                continue
+            }
+
+            let backuppath = dataFolder.stringByAppendingPathComponent(device).stringByAppendingPathComponent(backupDate)
+
+            nm.createDirectoryAtPath(backuppath, withIntermediateDirectories: true, attributes: nil, error: nil)
+            
+            nm.copyItemAtPath(path + "/Info.plist", toPath: backuppath + "/Info.plist", error: nil)
+            nm.copyItemAtPath(path + "/Status.plist", toPath: backuppath + "/Status.plist", error: nil)
+            nm.copyItemAtPath(path + "/Manifest.plist", toPath: backuppath + "/Manifest.plist", error: nil)
+            nm.copyItemAtPath(path + "/Manifest.mbdb", toPath: backuppath + "/Manifest.mbdb", error: nil)
         }
-        let attr = nm.attributesOfItemAtPath(file, error: nil)!
-        let backupDate = backupFormatter.stringFromDate(attr["NSFileModificationDate"] as NSDate)
-        if backups.count > 0 && (backups.lastObject as NSString).isEqual(backupDate)
-        {
-            return
-        }
-        
-        let backuppath = dataFolder.stringByAppendingPathComponent(device).stringByAppendingPathComponent(backupDate)
-        
-        /*if !nm.fileExistsAtPath(devicepath)
-        {
-            nm.createDirectoryAtPath(devicepath, withIntermediateDirectories: <#Bool#>, attributes: <#[NSObject : AnyObject]?#>, error: <#NSErrorPointer#>)
-        }*/
         
         
-        nm.createDirectoryAtPath(backuppath, withIntermediateDirectories: true, attributes: nil, error: nil)
         
-        nm.copyItemAtPath(path + "/Info.plist", toPath: backuppath + "/Info.plist", error: nil)
-        nm.copyItemAtPath(path + "/Status.plist", toPath: backuppath + "/Status.plist", error: nil)
-        nm.copyItemAtPath(path + "/Manifest.plist", toPath: backuppath + "/Manifest.plist", error: nil)
-        nm.copyItemAtPath(path + "/Manifest.mbdb", toPath: backuppath + "/Manifest.mbdb", error: nil)
         
         /*
         let files = nm.contentsOfDirectoryAtPath(
