@@ -197,19 +197,25 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                 return
             }
             
-            var apps1, apps2 : NSMutableArray!
+            //var apps1, apps2 : NSMutableArray!
+            var apps_1, apps_2 : NSMutableDictionary!
             var dict1, dict2 : NSMutableDictionary!
             
             let deviceFolder = dataFolder.stringByAppendingPathComponent(devices.allKeys[devicesView.selectedRow] as NSString)
             let path1 = deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow - 1] as NSString).stringByAppendingPathComponent("Info.plist")
             let path2 = deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow] as NSString).stringByAppendingPathComponent("Info.plist")
 
+            var manifest1 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow - 1] as NSString).stringByAppendingPathComponent("Manifest.plist"))
+            
+            var manifest2 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow] as NSString).stringByAppendingPathComponent("Manifest.plist"))
+            
             var nm = NSFileManager()
             
             if nm.fileExistsAtPath(path1)
             {
                 dict1 = NSMutableDictionary(contentsOfFile: path1)
-                apps1 = dict1.objectForKey("Installed Applications") as NSMutableArray
+                //apps1 = dict1.objectForKey("Installed Applications") as NSMutableArray
+                apps_1 = manifest1?.objectForKey("Applications") as NSMutableDictionary
             }
             else
             {
@@ -221,7 +227,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             if nm.fileExistsAtPath(path2)
             {
                 dict2 = NSMutableDictionary(contentsOfFile: path2)
-                apps2 = dict2.objectForKey("Installed Applications") as NSMutableArray
+                //apps2 = dict2.objectForKey("Installed Applications") as NSMutableArray
+                apps_2 = manifest2?.objectForKey("Applications") as NSMutableDictionary
             }
             else
             {
@@ -232,20 +239,21 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             
             //NSLog("okay.");
             
-            result.appendFormat("Previous has %ld applications\n", apps1.count)
+            result.appendFormat("Previous has %ld applications\n", apps_1.count)
             //NSLog("Previous has %ld applications", apps1.count);
-            result.appendFormat("Then has %ld applications\n", apps2.count)
+            result.appendFormat("Then has %ld applications\n", apps_2.count)
             //NSLog("Then has %ld applications", apps2.count);
             
             result.appendString("\n= 删除的Apps:\n\n")
             
             var n1 = 0, n2 = 0
-            for (var i = 0; i < apps1.count; ++i)
+            for (var i = 0; i < apps_1.count; ++i)
             {
                 var found = false
-                for (var j = 0; j < apps2.count; ++j)
+                for (var j = 0; j < apps_2.count; ++j)
                 {
-                    if apps1.objectAtIndex(i).isEqualToString(apps2.objectAtIndex(j) as NSString)
+                    //if apps1.objectAtIndex(i).isEqualToString(apps2.objectAtIndex(j) as NSString)
+                    if apps_1.allKeys[i].isEqualToString(apps_2.allKeys[j] as NSString)
                     {
                         found = true;
                         break;
@@ -254,7 +262,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                 if (!found)
                 {
                     ++n1;
-                    result.appendFormat("[%@]\n", apps1.objectAtIndex(i) as NSString)
+                    //result.appendFormat("[%@]\n", apps1.objectAtIndex(i) as NSString)
+                    result.appendFormat("[%@]\n", apps_1.allKeys[i] as NSString)
                     //NSLog("the app [%@] is at iOS 7 but not at iOS 8", apps1.objectAtIndex(i) as NSString);
                 }
             }
@@ -266,12 +275,13 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             
             result.appendString("\n= 新装的Apps:\n\n")
             
-            for (var i = 0; i < apps2.count; ++i)
+            for (var i = 0; i < apps_2.count; ++i)
             {
                 var found = false;
-                for (var j = 0; j < apps1.count; ++j)
+                for (var j = 0; j < apps_1.count; ++j)
                 {
-                    if apps2.objectAtIndex(i).isEqualToString(apps1.objectAtIndex(j) as NSString)
+                    //if apps2.objectAtIndex(i).isEqualToString(apps1.objectAtIndex(j) as NSString)
+                    if apps_2.allKeys[i].isEqualToString(apps_1.allKeys[j] as NSString)
                     {
                         found = true;
                         break;
@@ -280,7 +290,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                 if (!found)
                 {
                     n2++;
-                    result.appendFormat("[%@]\n", apps2.objectAtIndex(i) as NSString)
+                    //result.appendFormat("[%@]\n", apps2.objectAtIndex(i) as NSString)
+                    result.appendFormat("[%@]\n", apps_2.allKeys[i] as NSString)
                     //NSLog("the app [%@] is at iOS 8 but not at iOS 7", apps2.objectAtIndex(i) as NSString);
                 }
             }
