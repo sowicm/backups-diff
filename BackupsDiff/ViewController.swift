@@ -200,12 +200,10 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     @IBAction func getBackupInfo(sender: AnyObject) {
         var nm = NSFileManager()
-        if devicesView.selectedRow < 0
-        {
-            NSLog("未选择设备")
-            return
-        }
-        let device = devices.allKeys[devicesView.selectedRow] as NSString
+        
+        for idevice in devices.allKeys {
+        
+        let device = idevice as NSString
         
         let files = nm.contentsOfDirectoryAtPath(backupFolder, error: nil)
         if files == nil {
@@ -223,14 +221,19 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             
             var path = backupFolder.stringByAppendingPathComponent(file)
             
-            if !nm.fileExistsAtPath(path + "/Info.plist")
+            if !nm.fileExistsAtPath(path + "/Manifest.plist")
             {
-                NSLog("%@ 中缺失文件 Info.plist", path)
+                NSLog("%@ 中缺失文件 Manifest.plist", path)
                 continue
             }
             
+            /*
             let attr = nm.attributesOfItemAtPath(path + "/Info.plist", error: nil)!
             let backupDate = backupFormatter.stringFromDate(attr["NSFileModificationDate"] as NSDate)
+            */
+            
+            let manifest : NSMutableDictionary! = NSMutableDictionary(contentsOfFile: path + "/Manifest.plist")
+            let backupDate = backupFormatter.stringFromDate(manifest["Date"] as NSDate)
             
             var alreadyhas = false
             for backup in backups {
@@ -253,18 +256,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             nm.copyItemAtPath(path + "/Manifest.mbdb", toPath: backuppath + "/Manifest.mbdb", error: nil)
         }
         
+        }
         
-        
-        
-        /*
-        let files = nm.contentsOfDirectoryAtPath(
-            path, error: nil)
-        if files == nil {
-            return
-        }*/
-        
-        
-        //NSLog("%@", attr["NSFileModificationDate"] as NSDate);
     }
     
     
