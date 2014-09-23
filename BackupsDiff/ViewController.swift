@@ -185,9 +185,110 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                 
                 backups.addObject(file)
             }
+            //        backups.sortUsingComparator(<#cmptr: NSComparator##(AnyObject!, AnyObject!) -> NSComparisonResult#>)
+
             backupsView.reloadData()
         }
-//        backups.sortUsingComparator(<#cmptr: NSComparator##(AnyObject!, AnyObject!) -> NSComparisonResult#>)
+        else if tableView.tag == 2
+        {
+            var result = NSMutableString()
+            
+            if tableView.selectedRow < 1 {
+                return
+            }
+            
+            var apps1, apps2 : NSMutableArray!
+            var dict1, dict2 : NSMutableDictionary!
+            
+            let deviceFolder = dataFolder.stringByAppendingPathComponent(devices.allKeys[devicesView.selectedRow] as NSString)
+            let path1 = deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow - 1] as NSString).stringByAppendingPathComponent("Info.plist")
+            let path2 = deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow] as NSString).stringByAppendingPathComponent("Info.plist")
+
+            var nm = NSFileManager()
+            
+            if nm.fileExistsAtPath(path1)
+            {
+                dict1 = NSMutableDictionary(contentsOfFile: path1)
+                apps1 = dict1.objectForKey("Installed Applications") as NSMutableArray
+            }
+            else
+            {
+                result.appendString("not found path1\n")
+                //NSLog("not found path1");
+                return
+            }
+            
+            if nm.fileExistsAtPath(path2)
+            {
+                dict2 = NSMutableDictionary(contentsOfFile: path2)
+                apps2 = dict2.objectForKey("Installed Applications") as NSMutableArray
+            }
+            else
+            {
+                result.appendString("not found path2\n")
+                //NSLog("not found paht2");
+                return
+            }
+            
+            //NSLog("okay.");
+            
+            result.appendFormat("Previous has %ld applications\n", apps1.count)
+            //NSLog("Previous has %ld applications", apps1.count);
+            result.appendFormat("Then has %ld applications\n", apps2.count)
+            //NSLog("Then has %ld applications", apps2.count);
+            
+            result.appendString("\n= 删除的Apps:\n\n")
+            
+            var n1 = 0, n2 = 0
+            for (var i = 0; i < apps1.count; ++i)
+            {
+                var found = false
+                for (var j = 0; j < apps2.count; ++j)
+                {
+                    if apps1.objectAtIndex(i).isEqualToString(apps2.objectAtIndex(j) as NSString)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    ++n1;
+                    result.appendFormat("[%@]\n", apps1.objectAtIndex(i) as NSString)
+                    //NSLog("the app [%@] is at iOS 7 but not at iOS 8", apps1.objectAtIndex(i) as NSString);
+                }
+            }
+            
+            result.appendFormat("\n共删除数量: %d\n", n1)
+            result.appendString("-------------------------------\n")
+            //NSLog("total %d items", n1);
+            //NSLog("---------------");
+            
+            result.appendString("\n= 新装的Apps:\n\n")
+            
+            for (var i = 0; i < apps2.count; ++i)
+            {
+                var found = false;
+                for (var j = 0; j < apps1.count; ++j)
+                {
+                    if apps2.objectAtIndex(i).isEqualToString(apps1.objectAtIndex(j) as NSString)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    n2++;
+                    result.appendFormat("[%@]\n", apps2.objectAtIndex(i) as NSString)
+                    //NSLog("the app [%@] is at iOS 8 but not at iOS 7", apps2.objectAtIndex(i) as NSString);
+                }
+            }
+            result.appendFormat("\n共新装数量: %d\n", n2)
+            //NSLog("total %d items", n2);
+            
+            resultText.string = result
+        }
     }
     
     func getNormalBackup(device : NSString) {
@@ -263,5 +364,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     @IBOutlet weak var devicesView: NSTableView!
     @IBOutlet weak var backupsView: NSTableView!
+    @IBOutlet var resultText: NSTextView!
 }
 
