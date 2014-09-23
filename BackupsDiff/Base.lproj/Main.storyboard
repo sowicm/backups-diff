@@ -678,7 +678,7 @@
                                     <rect key="frame" x="1" y="0.0" width="238" height="134"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView verticalHuggingPriority="750" tag="1" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="N2V-4V-xUh" viewBased="YES" id="VHg-n3-1fg" customClass="DevicesView" customModule="BackupsDiff" customModuleProvider="target">
+                                        <tableView verticalHuggingPriority="750" tag="1" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="N2V-4V-xUh" viewBased="YES" id="VHg-n3-1fg">
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -876,11 +876,15 @@
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <connections>
+                                    <action selector="getBackupInfo:" target="XfG-lQ-9wD" id="Rql-LO-lVW"/>
+                                </connections>
                             </button>
                         </subviews>
                     </view>
                     <connections>
-                        <outlet property="devicesView" destination="3gx-h7-NEq" id="Y2m-1Q-lUK"/>
+                        <outlet property="backupsView" destination="1da-wX-Btj" id="k5u-jQ-QZB"/>
+                        <outlet property="devicesView" destination="VHg-n3-1fg" id="YC7-Km-EHy"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
