@@ -191,6 +191,11 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             }
             if (!found)
             {
+                if (apps1.objectAtIndex(i) as! String).hasPrefix("group.")
+                {
+                    continue
+                }
+                
                 ++n1;
                 result.appendFormat("[%@]\n", apps1.objectAtIndex(i) as! NSString)
                 //NSLog("the app [%@] is at iOS 7 but not at iOS 8", apps1.objectAtIndex(i) as NSString);
@@ -217,6 +222,11 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             }
             if (!found)
             {
+                if (apps2.objectAtIndex(i) as! String).hasPrefix("group.")
+                {
+                    continue
+                }
+                
                 n2++;
                 result.appendFormat("[%@]\n", apps2.objectAtIndex(i) as! NSString)
                 //NSLog("the app [%@] is at iOS 8 but not at iOS 7", apps2.objectAtIndex(i) as NSString);
