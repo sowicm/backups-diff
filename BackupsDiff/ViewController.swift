@@ -14,7 +14,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         super.viewDidLoad()
 
         var paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
-        dataFolder = paths[0].stringByAppendingPathComponent("BackupsDiff/")
+        dataFolder = (paths[0] as NSString).stringByAppendingPathComponent("BackupsDiff/")
         
         backupFolder = "/Users/sowicm/Library/Application Support/MobileSync/Backup"
         
@@ -58,61 +58,62 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     @IBAction func getDevices(sender: AnyObject) {
         var nm = NSFileManager()
-        var error = NSError()
-        let files = nm.contentsOfDirectoryAtPath(backupFolder, error: nil)
-        if files == nil {
-          return
-        }
-        
-        let prompt = "请为该设备设定一个名称："
-        let defaultValue = "iPhone"
-        
-        
-        for each in files!
-        {
-            var file : NSString = each as NSString
-            if file.hasPrefix(".")
-            {
-                continue
-            }
-            if file.rangeOfString("-").length > 0
-            {
-                continue
-            }
-            if devices[file] != nil
-            {
-                continue
-            }
-        
-            var input = NSTextField()
-            input.frame = NSMakeRect(0, 0, 200, 24)
-            //input.setFrameOrigin(0, 0)
-            //input.setFrameSize(200, 24)
-            //input.setValue(defaultValue)
+        do {
+            let files = try nm.contentsOfDirectoryAtPath(backupFolder as String)
             
-            var alert = NSAlert()
-            alert.messageText = prompt
-            alert.informativeText = file
-            alert.addButtonWithTitle("Save")
-            alert.addButtonWithTitle("Cancel")
-            alert.accessoryView = input
-            if alert.runModal() == NSAlertFirstButtonReturn
+            let prompt = "请为该设备设定一个名称："
+            let defaultValue = "iPhone"
+            
+            for each in files
             {
-                input.validateEditing()
-                devices[file] = input.stringValue
-                //NSLog("%@", input.stringValue)
-            }
-            else
-            {
-                devices[file] = file
+                var file : NSString = each as NSString
+                if file.hasPrefix(".")
+                {
+                    continue
+                }
+                if file.rangeOfString("-").length > 0
+                {
+                    continue
+                }
+                if devices[file] != nil
+                {
+                    continue
+                }
+                
+                var input = NSTextField()
+                input.frame = NSMakeRect(0, 0, 200, 24)
+                //input.setFrameOrigin(0, 0)
+                //input.setFrameSize(200, 24)
+                //input.setValue(defaultValue)
+                
+                var alert = NSAlert()
+                alert.messageText = prompt
+                alert.informativeText = file as String
+                alert.addButtonWithTitle("Save")
+                alert.addButtonWithTitle("Cancel")
+                alert.accessoryView = input
+                if alert.runModal() == NSAlertFirstButtonReturn
+                {
+                    input.validateEditing()
+                    devices[file] = input.stringValue
+                    //NSLog("%@", input.stringValue)
+                }
+                else
+                {
+                    devices[file] = file
+                }
+                
+                //NSLog("%@", file as NSString)
             }
             
-            //NSLog("%@", file as NSString)
+        } catch {
+            print(error)
+            return
         }
         
         saveDevices()
         
-        devicesView.reloadData()
+        // shouldn't comment #TODO# devicesView.reloadData()
     }
     
 
@@ -136,11 +137,11 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         {
         case 1:
             var cellView = tableView.makeViewWithIdentifier("device", owner: tableView) as! NSTableCellView
-            cellView.textField.stringValue = devices.allValues[row] as NSString
+            cellView.textField!.stringValue = devices.allValues[row] as! NSString as String
             return cellView
         case 2:
             var cellView = tableView.makeViewWithIdentifier("backup", owner: tableView) as! NSTableCellView
-            cellView.textField.stringValue = backups[row] as NSString
+            cellView.textField!.stringValue = backups[row] as! NSString as String
             return cellView
             
         default:
@@ -270,9 +271,10 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         switch sourceRadio.selectedColumn
         {
         case 0:
-            var manifest1 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow - 1] as NSString).stringByAppendingPathComponent("Manifest.plist"))
+            var manifest1 = NSMutableDictionary(contentsOfFile: (deviceFolder)): [)
+            var manifest1 = NSMutableDictionary(contentsOfFile: (deviceFolder as NSString).stringByAppendingPathComponent(backups[tableView.selectedRow - 1] as! NSString as String).stringByAppendingPathComponent("Manifest.plist"))
             
-            var manifest2 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow] as NSString).stringByAppendingPathComponent("Manifest.plist"))
+            var manifest2 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow] as! NSString as String).stringByAppendingPathComponent("Manifest.plist"))
             
             var apps1 : NSDictionary! = manifest1?.objectForKey("Applications") as NSMutableDictionary
             var apps2 : NSDictionary! = manifest2?.objectForKey("Applications") as NSMutableDictionary
@@ -358,7 +360,12 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         
         let device = idevice as! NSString
         
-        let files = nm.contentsOfDirectoryAtPath(backupFolder, error: nil)
+        var files = nil
+        do {
+            files = try nm.contentsOfDirectoryAtPath(backupFolder)
+        } catch {
+            print(error)
+        }
         if files == nil {
             return
         }
