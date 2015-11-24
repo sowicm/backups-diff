@@ -57,7 +57,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     var backupFormatter : NSDateFormatter!
     
     @IBAction func getDevices(sender: AnyObject) {
-        var nm = NSFileManager()
+        let nm = NSFileManager()
         do {
             let files = try nm.contentsOfDirectoryAtPath(backupFolder as String)
             
@@ -66,7 +66,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             
             for each in files
             {
-                var file : NSString = each as NSString
+                let file : NSString = each as NSString
                 if file.hasPrefix(".")
                 {
                     continue
@@ -80,13 +80,13 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                     continue
                 }
                 
-                var input = NSTextField()
+                let input = NSTextField()
                 input.frame = NSMakeRect(0, 0, 200, 24)
                 //input.setFrameOrigin(0, 0)
                 //input.setFrameSize(200, 24)
                 //input.setValue(defaultValue)
                 
-                var alert = NSAlert()
+                let alert = NSAlert()
                 alert.messageText = prompt
                 alert.informativeText = file as String
                 alert.addButtonWithTitle("Save")
@@ -136,11 +136,11 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         switch (tableView.tag)
         {
         case 1:
-            var cellView = tableView.makeViewWithIdentifier("device", owner: tableView) as! NSTableCellView
+            let cellView = tableView.makeViewWithIdentifier("device", owner: tableView) as! NSTableCellView
             cellView.textField!.stringValue = devices.allValues[row] as! NSString as String
             return cellView
         case 2:
-            var cellView = tableView.makeViewWithIdentifier("backup", owner: tableView) as! NSTableCellView
+            let cellView = tableView.makeViewWithIdentifier("backup", owner: tableView) as! NSTableCellView
             cellView.textField!.stringValue = backups[row] as! NSString as String
             return cellView
             
