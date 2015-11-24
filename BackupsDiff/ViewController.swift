@@ -149,24 +149,9 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         }
     }
     
-    func compareBackupsBetween(apps1: NSArray, apps2: NSArray) {
+    func compareBackupsBetween(apps1: NSArray, apps2: NSArray, manifest1: NSDictionary, manifest2: NSDictionary) {
         
         let result = NSMutableString()
-        
-        switch (sourceRadio.selectedColumn)
-        {
-        case 0:
-            result.appendString("Manifest\n\n\n")
-            break
-            
-        case 1:
-            result.appendString("Info\n\n\n")
-            break
-            
-        default:
-            break
-        }
-
         
         //NSLog("okay.");
         
@@ -191,13 +176,32 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             }
             if (!found)
             {
-                if (apps1.objectAtIndex(i) as! String).hasPrefix("group.")
+                // skip apple applications
+                //if (apps1.objectAtIndex(i) as! String).hasPrefix("com.apple.")
+                //{
+                //    continue
+                //}
+                
+                var hasPath = false
+                let packageName = apps1.objectAtIndex(i) as! NSString
+                let appdic = manifest1.objectForKey( packageName )
+                if appdic != nil
                 {
-                    continue
+                    let pathString = (appdic as! NSDictionary).objectForKey("Path")
+                    if pathString != nil
+                    {
+                        let path = NSURL(fileURLWithPath: pathString as! String)
+                        //result.appendFormat("%@\n(%@)\n", path.lastPathComponent as! NSString, packageName)
+                        result.appendFormat("%@\n", path.lastPathComponent as! NSString)
+                        hasPath = true
+                    }
+                }
+                if !hasPath
+                {
+                    result.appendFormat("[%@]\n", packageName)
                 }
                 
                 ++n1;
-                result.appendFormat("[%@]\n", apps1.objectAtIndex(i) as! NSString)
                 //NSLog("the app [%@] is at iOS 7 but not at iOS 8", apps1.objectAtIndex(i) as NSString);
             }
         }
@@ -222,13 +226,31 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             }
             if (!found)
             {
-                if (apps2.objectAtIndex(i) as! String).hasPrefix("group.")
+                //if (apps2.objectAtIndex(i) as! String).hasPrefix("group.")
+                //{
+                //    continue
+                //}
+                
+                var hasPath = false
+                let packageName = apps2.objectAtIndex(i) as! NSString
+                let appdic = manifest2.objectForKey( packageName )
+                if appdic != nil
                 {
-                    continue
+                    let pathString = (appdic as! NSDictionary).objectForKey("Path")
+                    if pathString != nil
+                    {
+                        let path = NSURL(fileURLWithPath: pathString as! String)
+                        //result.appendFormat("%@\n(%@)\n", path.lastPathComponent as! NSString, packageName)
+                        result.appendFormat("%@\n", path.lastPathComponent as! NSString)
+                        hasPath = true
+                    }
+                }
+                if !hasPath
+                {
+                    result.appendFormat("[%@]\n", packageName)
                 }
                 
                 n2++;
-                result.appendFormat("[%@]\n", apps2.objectAtIndex(i) as! NSString)
                 //NSLog("the app [%@] is at iOS 8 but not at iOS 7", apps2.objectAtIndex(i) as NSString);
             }
         }
@@ -277,13 +299,29 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         }
         */
         
+        let manifest1 = NSMutableDictionary(contentsOfURL: (NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow - 1] as! String).URLByAppendingPathComponent("Manifest.plist")))// as String)
         
+        let manifest2 = NSMutableDictionary(contentsOfURL: (NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow] as! String).URLByAppendingPathComponent("Manifest.plist")))
+        
+        let info1 = NSMutableDictionary(contentsOfURL: NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow - 1] as! String).URLByAppendingPathComponent("Info.plist"))
+        
+        let info2 = NSMutableDictionary(contentsOfURL: NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow] as! String).URLByAppendingPathComponent("Info.plist"))
+        
+        let apps1: AnyObject? = info1?.objectForKey("Installed Applications")
+        let apps2: AnyObject? = info2?.objectForKey("Installed Applications")
+
+        if apps1 == nil || apps2 == nil
+        {
+            return
+        }
+        
+        compareBackupsBetween(apps1 as! NSArray, apps2: apps2 as! NSArray, manifest1: manifest1!.objectForKey("Applications") as! NSDictionary, manifest2: manifest2!.objectForKey("Applications") as! NSDictionary)
+        
+        /*
         switch sourceRadio.selectedColumn
         {
         case 0:
-            let manifest1 = NSMutableDictionary(contentsOfURL: (NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow - 1] as! String).URLByAppendingPathComponent("Manifest.plist")))// as String)
-            
-            let manifest2 = NSMutableDictionary(contentsOfURL: (NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow] as! String).URLByAppendingPathComponent("Manifest.plist")))
+
             
             let apps1 : NSDictionary! = manifest1?.objectForKey("Applications") as! NSMutableDictionary
             let apps2 : NSDictionary! = manifest2?.objectForKey("Applications") as! NSMutableDictionary
@@ -293,19 +331,12 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             break;
             
         case 1:
-            let info1 = NSMutableDictionary(contentsOfURL: NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow - 1] as! String).URLByAppendingPathComponent("Info.plist"))
+
             
-            let info2 = NSMutableDictionary(contentsOfURL: NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow] as! String).URLByAppendingPathComponent("Info.plist"))
             
-            let apps1: AnyObject? = info1?.objectForKey("Installed Applications")
-            let apps2: AnyObject? = info2?.objectForKey("Installed Applications")
+
             
-            if apps1 == nil || apps2 == nil
-            {
-                return
-            }
             
-            compareBackupsBetween(apps1 as! NSArray, apps2: apps2 as! NSArray)
             
             break
             
@@ -328,6 +359,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         default:
             break
         }
+*/
 
     }
     
