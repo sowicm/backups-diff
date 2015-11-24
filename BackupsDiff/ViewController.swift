@@ -135,11 +135,11 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         switch (tableView.tag)
         {
         case 1:
-            var cellView = tableView.makeViewWithIdentifier("device", owner: tableView) as NSTableCellView
+            var cellView = tableView.makeViewWithIdentifier("device", owner: tableView) as! NSTableCellView
             cellView.textField.stringValue = devices.allValues[row] as NSString
             return cellView
         case 2:
-            var cellView = tableView.makeViewWithIdentifier("backup", owner: tableView) as NSTableCellView
+            var cellView = tableView.makeViewWithIdentifier("backup", owner: tableView) as! NSTableCellView
             cellView.textField.stringValue = backups[row] as NSString
             return cellView
             
@@ -182,7 +182,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             var found = false
             for (var j = 0; j < apps2.count; ++j)
             {
-                if apps1.objectAtIndex(i).isEqualToString(apps2.objectAtIndex(j) as NSString)
+                if apps1.objectAtIndex(i).isEqualToString(apps2.objectAtIndex(j) as! NSString as String)
                 {
                     found = true;
                     break;
@@ -191,7 +191,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             if (!found)
             {
                 ++n1;
-                result.appendFormat("[%@]\n", apps1.objectAtIndex(i) as NSString)
+                result.appendFormat("[%@]\n", apps1.objectAtIndex(i) as! NSString)
                 //NSLog("the app [%@] is at iOS 7 but not at iOS 8", apps1.objectAtIndex(i) as NSString);
             }
         }
@@ -208,7 +208,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             var found = false;
             for (var j = 0; j < apps1.count; ++j)
             {
-                if apps2.objectAtIndex(i).isEqualToString(apps1.objectAtIndex(j) as NSString)
+                if apps2.objectAtIndex(i).isEqualToString(apps1.objectAtIndex(j) as! NSString as String)
                 {
                     found = true;
                     break;
@@ -217,14 +217,14 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             if (!found)
             {
                 n2++;
-                result.appendFormat("[%@]\n", apps2.objectAtIndex(i) as NSString)
+                result.appendFormat("[%@]\n", apps2.objectAtIndex(i) as! NSString)
                 //NSLog("the app [%@] is at iOS 8 but not at iOS 7", apps2.objectAtIndex(i) as NSString);
             }
         }
         result.appendFormat("\n共新装数量: %d\n", n2)
         //NSLog("total %d items", n2);
         
-        resultText.string = result
+        resultText.string = result as String
     }
     
     func reloadCompare() {
@@ -237,7 +237,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             return
         }
         
-        let deviceFolder = dataFolder.stringByAppendingPathComponent(devices.allKeys[devicesView.selectedRow] as NSString)
+        let deviceFolder = dataFolder.stringByAppendingPathComponent(devices.allKeys[devicesView.selectedRow] as! NSString as String)
         
         
         /*
@@ -294,7 +294,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                 return
             }
             
-            compareBackupsBetween(apps1 as NSArray, apps2: apps2 as NSArray)
+            compareBackupsBetween(apps1 as! NSArray, apps2: apps2 as! NSArray)
             
             break;
             
@@ -305,7 +305,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
     
     func tableViewSelectionDidChange(notification: NSNotification!) {
-        var tableView = notification.object as NSTableView
+        var tableView = notification.object as! NSTableView
         if (tableView.tag == 1)
         {
             //NSLog("changed")
@@ -356,7 +356,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         
         for idevice in devices.allKeys {
         
-        let device = idevice as NSString
+        let device = idevice as! NSString
         
         let files = nm.contentsOfDirectoryAtPath(backupFolder, error: nil)
         if files == nil {

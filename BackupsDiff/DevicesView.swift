@@ -16,7 +16,7 @@ class DevicesView: NSTableView {
         // Drawing code here.
     }
     
-    override func viewAtColumn(column: Int, row: Int, makeIfNecessary: Bool) -> AnyObject! {
+    override func viewAtColumn(column: Int, row: Int, makeIfNecessary: Bool) -> NSView! {
         var cellView = NSTableCellView()
         cellView.textField.stringValue = "abc"
         return cellView
