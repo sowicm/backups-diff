@@ -62,7 +62,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             let files = try nm.contentsOfDirectoryAtPath(backupFolder as String)
             
             let prompt = "请为该设备设定一个名称："
-            let defaultValue = "iPhone"
+            //let defaultValue = "iPhone"
             
             for each in files
             {
@@ -117,7 +117,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
     
 
-    func numberOfRowsInTableView(tableView: NSTableView!) -> Int {
+    func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         switch (tableView.tag)
         {
         case 1:
@@ -132,7 +132,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
     
     
-    func tableView(tableView: NSTableView!, viewForTableColumn tableColumn: NSTableColumn!, row: Int) -> NSView! {
+    func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
         switch (tableView.tag)
         {
         case 1:
@@ -151,7 +151,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     func compareBackupsBetween(apps1: NSArray, apps2: NSArray) {
         
-        var result = NSMutableString()
+        let result = NSMutableString()
         
         switch (sourceRadio.selectedColumn)
         {
@@ -271,24 +271,24 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         switch sourceRadio.selectedColumn
         {
         case 0:
-            var manifest1 = NSMutableDictionary(contentsOfURL: (NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow - 1] as! String).URLByAppendingPathComponent("Manifest.plist")))// as String)
+            let manifest1 = NSMutableDictionary(contentsOfURL: (NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow - 1] as! String).URLByAppendingPathComponent("Manifest.plist")))// as String)
             
-            var manifest2 = NSMutableDictionary(contentsOfURL: (NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow] as! String).URLByAppendingPathComponent("Manifest.plist")))
+            let manifest2 = NSMutableDictionary(contentsOfURL: (NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow] as! String).URLByAppendingPathComponent("Manifest.plist")))
             
-            var apps1 : NSDictionary! = manifest1?.objectForKey("Applications") as! NSMutableDictionary
-            var apps2 : NSDictionary! = manifest2?.objectForKey("Applications") as! NSMutableDictionary
+            let apps1 : NSDictionary! = manifest1?.objectForKey("Applications") as! NSMutableDictionary
+            let apps2 : NSDictionary! = manifest2?.objectForKey("Applications") as! NSMutableDictionary
             
             compareBackupsBetween(apps1.allKeys, apps2: apps2.allKeys)
             
             break;
             
         case 1:
-            var info1 = NSMutableDictionary(contentsOfURL: NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow - 1] as! String).URLByAppendingPathComponent("Info.plist"))
+            let info1 = NSMutableDictionary(contentsOfURL: NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow - 1] as! String).URLByAppendingPathComponent("Info.plist"))
             
-            var info2 = NSMutableDictionary(contentsOfURL: NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow] as! String).URLByAppendingPathComponent("Info.plist"))
+            let info2 = NSMutableDictionary(contentsOfURL: NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow] as! String).URLByAppendingPathComponent("Info.plist"))
             
-            var apps1: AnyObject? = info1?.objectForKey("Installed Applications")
-            var apps2: AnyObject? = info2?.objectForKey("Installed Applications")
+            let apps1: AnyObject? = info1?.objectForKey("Installed Applications")
+            let apps2: AnyObject? = info2?.objectForKey("Installed Applications")
             
             if apps1 == nil || apps2 == nil
             {
@@ -297,7 +297,23 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             
             compareBackupsBetween(apps1 as! NSArray, apps2: apps2 as! NSArray)
             
-            break;
+            break
+            
+        case 2:
+            let manifest = NSMutableDictionary(contentsOfURL: (NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow] as! String).URLByAppendingPathComponent("Manifest.plist")))
+            let info = NSMutableDictionary(contentsOfURL: NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow] as! String).URLByAppendingPathComponent("Info.plist"))
+            
+            let apps1 : NSDictionary! = manifest?.objectForKey("Applications") as! NSMutableDictionary
+            let apps2: AnyObject? = info?.objectForKey("Installed Applications")
+            
+            if apps1 == nil || apps2 == nil
+            {
+                return
+            }
+
+            compareBackupsBetween(apps1.allKeys, apps2: apps2 as! NSArray)
+            
+            break
             
         default:
             break

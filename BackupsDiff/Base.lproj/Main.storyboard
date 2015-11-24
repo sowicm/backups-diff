@@ -878,7 +878,7 @@
                                 </connections>
                             </button>
                             <matrix verticalHuggingPriority="750" fixedFrame="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="H2h-DK-lUu">
-                                <rect key="frame" x="293" y="258" width="156" height="18"/>
+                                <rect key="frame" x="251" y="271" width="233" height="18"/>
                                 <animations/>
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 <size key="cellSize" width="75" height="18"/>
@@ -896,6 +896,12 @@
                                     </column>
                                     <column>
                                         <buttonCell type="radio" title="Info" imagePosition="left" alignment="left" inset="2" id="WBS-nO-5bM">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </column>
+                                    <column>
+                                        <buttonCell type="radio" title="Check" imagePosition="left" alignment="left" inset="2" id="K5H-nP-Mwo">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
