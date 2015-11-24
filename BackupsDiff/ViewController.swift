@@ -113,7 +113,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         
         saveDevices()
         
-        // shouldn't comment #TODO# devicesView.reloadData()
+        devicesView.reloadData()
     }
     
 
@@ -271,22 +271,21 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         switch sourceRadio.selectedColumn
         {
         case 0:
-            var manifest1 = NSMutableDictionary(contentsOfFile: (deviceFolder)): [)
-            var manifest1 = NSMutableDictionary(contentsOfFile: (deviceFolder as NSString).stringByAppendingPathComponent(backups[tableView.selectedRow - 1] as! NSString as String).stringByAppendingPathComponent("Manifest.plist"))
+            var manifest1 = NSMutableDictionary(contentsOfURL: (NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow - 1] as! String).URLByAppendingPathComponent("Manifest.plist")))// as String)
             
-            var manifest2 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow] as! NSString as String).stringByAppendingPathComponent("Manifest.plist"))
+            var manifest2 = NSMutableDictionary(contentsOfURL: (NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow] as! String).URLByAppendingPathComponent("Manifest.plist")))
             
-            var apps1 : NSDictionary! = manifest1?.objectForKey("Applications") as NSMutableDictionary
-            var apps2 : NSDictionary! = manifest2?.objectForKey("Applications") as NSMutableDictionary
+            var apps1 : NSDictionary! = manifest1?.objectForKey("Applications") as! NSMutableDictionary
+            var apps2 : NSDictionary! = manifest2?.objectForKey("Applications") as! NSMutableDictionary
             
             compareBackupsBetween(apps1.allKeys, apps2: apps2.allKeys)
             
             break;
             
         case 1:
-            var info1 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow - 1] as NSString).stringByAppendingPathComponent("Info.plist"))
+            var info1 = NSMutableDictionary(contentsOfURL: NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow - 1] as! String).URLByAppendingPathComponent("Info.plist"))
             
-            var info2 = NSMutableDictionary(contentsOfFile: deviceFolder.stringByAppendingPathComponent(backups[tableView.selectedRow] as NSString).stringByAppendingPathComponent("Info.plist"))
+            var info2 = NSMutableDictionary(contentsOfURL: NSURL(fileURLWithPath: deviceFolder).URLByAppendingPathComponent(backups[tableView.selectedRow] as! String).URLByAppendingPathComponent("Info.plist"))
             
             var apps1: AnyObject? = info1?.objectForKey("Installed Applications")
             var apps2: AnyObject? = info2?.objectForKey("Installed Applications")
@@ -315,34 +314,36 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             backups = NSMutableArray()
             
             var nm = NSFileManager()
-            let file = dataFolder.stringByAppendingPathComponent(devices.allKeys[tableView.selectedRow] as NSString)
+            let file = (dataFolder as! NSString).stringByAppendingPathComponent(devices.allKeys[tableView.selectedRow] as! String)
             if !nm.fileExistsAtPath(file)
             {
                 backupsView.reloadData()
                 return
             }
 
-            let files = nm.contentsOfDirectoryAtPath(
-                file, error: nil)
-            if files == nil {
+            do
+            {
+                let files = try nm.contentsOfDirectoryAtPath(
+                    file)
+                for each in files
+                {
+                    let file = each as NSString
+                    if file.hasPrefix(".")
+                    {
+                        continue
+                    }
+                    if file.rangeOfString("-").length < 1
+                    {
+                        continue
+                    }
+                    
+                    backups.addObject(file)
+                }
+            } catch {
                 backupsView.reloadData()
                 return
             }
             
-            for each in files!
-            {
-                let file = each as NSString
-                if file.hasPrefix(".")
-                {
-                    continue
-                }
-                if file.rangeOfString("-").length < 1
-                {
-                    continue
-                }
-                
-                backups.addObject(file)
-            }
             //        backups.sortUsingComparator(<#cmptr: NSComparator##(AnyObject!, AnyObject!) -> NSComparisonResult#>)
 
             backupsView.reloadData()
@@ -360,64 +361,64 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         
         let device = idevice as! NSString
         
-        var files = nil
         do {
-            files = try nm.contentsOfDirectoryAtPath(backupFolder)
-        } catch {
-            print(error)
-        }
-        if files == nil {
-            return
-        }
-        
-        var count = 0
-        for each in files!
-        {
-            let file = each as NSString
-            if !file.hasPrefix(device)
+            let files = try nm.contentsOfDirectoryAtPath(backupFolder as String)
+            var count = 0
+            for each in files
             {
-                continue
-            }
-            
-            var path = backupFolder.stringByAppendingPathComponent(file)
-            
-            if !nm.fileExistsAtPath(path + "/Manifest.plist")
-            {
-                NSLog("%@ 中缺失文件 Manifest.plist", path)
-                continue
-            }
-            
-            /*
-            let attr = nm.attributesOfItemAtPath(path + "/Info.plist", error: nil)!
-            let backupDate = backupFormatter.stringFromDate(attr["NSFileModificationDate"] as NSDate)
-            */
-            
-            let manifest : NSMutableDictionary! = NSMutableDictionary(contentsOfFile: path + "/Manifest.plist")
-            let backupDate = backupFormatter.stringFromDate(manifest["Date"] as NSDate)
-            
-            var alreadyhas = false
-            for backup in backups {
-                if (backup as NSString).isEqualToString(backupDate) {
-                    alreadyhas = true
-                    break
+                let file = each as NSString
+                if !file.hasPrefix(device as String)
+                {
+                    continue
+                }
+                
+                var path = backupFolder.stringByAppendingPathComponent(file as String)
+                
+                if !nm.fileExistsAtPath(path + "/Manifest.plist")
+                {
+                    NSLog("%@ 中缺失文件 Manifest.plist", path)
+                    continue
+                }
+                
+                /*
+                let attr = nm.attributesOfItemAtPath(path + "/Info.plist", error: nil)!
+                let backupDate = backupFormatter.stringFromDate(attr["NSFileModificationDate"] as NSDate)
+                */
+                
+                let manifest : NSMutableDictionary! = NSMutableDictionary(contentsOfFile: path + "/Manifest.plist")
+                let backupDate = backupFormatter.stringFromDate(manifest["Date"] as! NSDate)
+                
+                var alreadyhas = false
+                for backup in backups {
+                    if (backup as! NSString).isEqualToString(backupDate) {
+                        alreadyhas = true
+                        break
+                    }
+                }
+                if alreadyhas {
+                    continue
+                }
+                
+                let backuppath = (dataFolder.stringByAppendingPathComponent(device as String) as NSString).stringByAppendingPathComponent(backupDate)
+                
+                do
+                {
+                    try nm.createDirectoryAtPath(backuppath, withIntermediateDirectories: true, attributes: nil)
+                
+                    try nm.copyItemAtPath(path + "/Info.plist", toPath: backuppath + "/Info.plist")
+                    try nm.copyItemAtPath(path + "/Status.plist", toPath: backuppath + "/Status.plist")
+                    try nm.copyItemAtPath(path + "/Manifest.plist", toPath: backuppath + "/Manifest.plist")
+                    try nm.copyItemAtPath(path + "/Manifest.mbdb", toPath: backuppath + "/Manifest.mbdb")
+                }
+                catch {
+                    
                 }
             }
-            if alreadyhas {
-                continue
-            }
-
-            let backuppath = dataFolder.stringByAppendingPathComponent(device).stringByAppendingPathComponent(backupDate)
-
-            nm.createDirectoryAtPath(backuppath, withIntermediateDirectories: true, attributes: nil, error: nil)
-            
-            nm.copyItemAtPath(path + "/Info.plist", toPath: backuppath + "/Info.plist", error: nil)
-            nm.copyItemAtPath(path + "/Status.plist", toPath: backuppath + "/Status.plist", error: nil)
-            nm.copyItemAtPath(path + "/Manifest.plist", toPath: backuppath + "/Manifest.plist", error: nil)
-            nm.copyItemAtPath(path + "/Manifest.mbdb", toPath: backuppath + "/Manifest.mbdb", error: nil)
+        } catch {
+            print(error)
+            return
         }
-        
         }
-        
     }
     
     @IBAction func sourceChanged(sender: AnyObject) {
